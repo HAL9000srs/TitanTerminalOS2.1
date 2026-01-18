@@ -1,13 +1,14 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, LineChart, BrainCircuit, Settings, Menu, Newspaper } from 'lucide-react';
+import { LayoutDashboard, Wallet, LineChart, BrainCircuit, Settings, Menu, Newspaper, LogOut } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onLogout: () => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onLogout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const NavItem = ({ id, icon: Icon, label }: { id: string; icon: any; label: string }) => (
@@ -49,7 +50,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           <NavItem id="markets" icon={LineChart} label="Global Markets" />
         </nav>
 
-        <div className="p-4 border-t border-terminal-border">
+        <div className="p-4 border-t border-terminal-border space-y-2">
           <button
             onClick={() => onTabChange('config')}
             title="Terminal Config"
@@ -62,6 +63,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <Settings size={16} />
             <span>Terminal Config</span>
           </button>
+          
+          <button
+            onClick={onLogout}
+            title="Sign Out"
+            className="flex items-center gap-3 px-4 py-3 text-sm w-full rounded transition-colors text-red-400 hover:text-red-300 hover:bg-red-500/10"
+          >
+            <LogOut size={16} />
+            <span>Terminate Session</span>
+          </button>
         </div>
       </aside>
 
@@ -73,20 +83,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <div className="w-6 h-6 bg-terminal-accent rounded flex items-center justify-center text-black font-bold text-xs">T</div>
             <span className="font-bold tracking-wider font-mono text-terminal-text">TITAN</span>
           </div>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-terminal-text">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-terminal-text" aria-label="Toggle mobile menu">
             <Menu size={24} />
           </button>
         </header>
 
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
-          <div className="absolute inset-0 z-50 bg-terminal-panel/95 backdrop-blur-md p-4 md:hidden">
+          <div className="absolute inset-0 z-50 bg-terminal-panel/95 backdrop-blur-md p-4 md:hidden flex flex-col">
             <div className="flex justify-end mb-6">
-              <button onClick={() => setMobileMenuOpen(false)} className="text-terminal-text">
+              <button onClick={() => setMobileMenuOpen(false)} className="text-terminal-text" aria-label="Close mobile menu">
                 <Menu size={24} />
               </button>
             </div>
-            <nav className="flex flex-col gap-2">
+            <nav className="flex-1 flex flex-col gap-2">
               <NavItem id="dashboard" icon={LayoutDashboard} label="Command Center" />
               <NavItem id="assets" icon={Wallet} label="Portfolio Manager" />
               <NavItem id="analysis" icon={BrainCircuit} label="AI Intelligence" />
@@ -94,6 +104,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
               <NavItem id="markets" icon={LineChart} label="Global Markets" />
               <NavItem id="config" icon={Settings} label="Terminal Config" />
             </nav>
+            <div className="mt-auto border-t border-terminal-border pt-4">
+               <button
+                onClick={onLogout}
+                className="flex items-center gap-3 px-4 py-3 text-sm w-full rounded transition-colors text-red-400 hover:text-red-300 hover:bg-red-500/10 font-bold"
+              >
+                <LogOut size={16} />
+                <span>TERMINATE SESSION</span>
+              </button>
+            </div>
           </div>
         )}
 

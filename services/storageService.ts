@@ -1,24 +1,40 @@
 import { Asset, INITIAL_ASSETS } from '../types';
+import { db, auth } from './firebase';
+import { collection, doc, getDocs, setDoc, writeBatch } from 'firebase/firestore';
 
-const STORAGE_KEY = 'titan_terminal_assets';
-
-export const loadAssets = (): Asset[] => {
+export const loadAssets = async (): Promise<Asset[]> => {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored);
+    const user = auth.currentUser;
+    if (!user) return INITIAL_ASSETS;
+
+    const querySnapshot = await getDocs(collection(db, 'users', user.uid, 'assets'));
+    if (querySnapshot.empty) {
+        return INITIAL_ASSETS;
     }
+    
+    return querySnapshot.docs.map(doc => doc.data() as Asset);
   } catch (e) {
-    console.error("Failed to load assets from storage", e);
+    console.error("Failed to load assets from firestore", e);
+    return INITIAL_ASSETS;
   }
-  return INITIAL_ASSETS;
 };
 
-export const saveAssets = (assets: Asset[]): void => {
+export const saveAssets = async (assets: Asset[]): Promise<void> => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Use a batch write for efficiency (though setDoc individually is fine for small updates, batch is better for full save)
+    const batch = writeBatch(db);
+    
+    assets.forEach(asset => {
+      const docRef = doc(db, 'users', user.uid, 'assets', asset.id);
+      batch.set(docRef, asset);
+    });
+
+    await batch.commit();
   } catch (e) {
-    console.error("Failed to save assets to storage", e);
+    console.error("Failed to save assets to firestore", e);
   }
 };
 

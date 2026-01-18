@@ -29,10 +29,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
       if (response.success && response.user) {
         onLogin(response.user);
       } else {
-        setError(response.message || "Authentication Failed");
+        // CRITICAL: Force the use of response.message
+        setError(response.message || "UNKNOWN REGISTRATION ERROR");
       }
     } catch (err) {
-      setError("System Error: Connection Refused");
+      setError("SYSTEM FAILURE: CONNECTION REFUSED");
     } finally {
       setIsLoading(false);
     }

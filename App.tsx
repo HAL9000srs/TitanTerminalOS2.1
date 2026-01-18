@@ -50,19 +50,23 @@ const App: React.FC = () => {
 
   // Check for existing session on mount
   useEffect(() => {
-    const session = userService.getSession();
-    if (session) {
-      setUser(session);
-    }
+    const initData = async () => {
+      const session = userService.getSession();
+      if (session) {
+        setUser(session);
+      }
 
-    const data = loadAssets();
-    const loadedAssets = data.length > 0 ? data : INITIAL_ASSETS;
-    setAssets(loadedAssets);
-    
-    // Register assets with stream service to initialize base prices
-    loadedAssets.forEach(a => marketStream.registerAsset(a.symbol, a.currentPrice));
-    
-    setIsLoading(false);
+      const data = await loadAssets();
+      const loadedAssets = data.length > 0 ? data : INITIAL_ASSETS;
+      setAssets(loadedAssets);
+      
+      // Register assets with stream service to initialize base prices
+      loadedAssets.forEach(a => marketStream.registerAsset(a.symbol, a.currentPrice));
+      
+      setIsLoading(false);
+    };
+
+    initData();
   }, []);
 
   // Initialize WebSocket connection
@@ -262,6 +266,7 @@ const App: React.FC = () => {
       <Layout 
         activeTab={activeTab} 
         onTabChange={setActiveTab}
+        onLogout={handleLogout}
       >
         {renderContent()}
       </Layout>
