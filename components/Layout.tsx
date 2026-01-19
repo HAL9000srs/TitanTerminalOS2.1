@@ -1,14 +1,16 @@
 import React from 'react';
-import { LayoutDashboard, Wallet, LineChart, BrainCircuit, Settings, Menu, Newspaper, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, LineChart, BrainCircuit, Settings, Menu, Newspaper, LogOut, User } from 'lucide-react';
+import { UserProfile } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   onTabChange: (tab: string) => void;
   onLogout: () => void;
+  user: UserProfile | null;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onLogout }) => {
+export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onLogout, user }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const NavItem = ({ id, icon: Icon, label }: { id: string; icon: any; label: string }) => (
@@ -33,12 +35,22 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar - Desktop */}
       <aside className="hidden md:flex flex-col w-64 border-r border-terminal-border bg-terminal-panel/95 backdrop-blur-sm z-20">
-        <div className="p-6 border-b border-terminal-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="p-6 border-b border-terminal-border">
+          <div className="flex items-center gap-2 mb-1">
             <div className="w-8 h-8 bg-gradient-to-br from-terminal-accent to-emerald-800 rounded flex items-center justify-center text-black font-bold text-lg shadow-[0_0_15px_rgba(0,220,130,0.3)]">
               T
             </div>
             <span className="font-bold text-lg tracking-wider font-mono text-terminal-text">TITAN<span className="text-terminal-accent">.OS</span></span>
+          </div>
+          {/* User Badge */}
+          <div className="mt-4 flex items-center gap-3 px-3 py-2 bg-black/40 rounded border border-terminal-border/50">
+             <div className="w-8 h-8 rounded-full bg-terminal-muted/20 flex items-center justify-center text-terminal-accent">
+                <User size={14} />
+             </div>
+             <div className="overflow-hidden">
+                <p className="text-xs text-white font-mono truncate">{user?.displayName || 'OPERATOR'}</p>
+                <p className="text-[10px] text-terminal-muted font-mono truncate">{user?.role} ACCESS</p>
+             </div>
           </div>
         </div>
 
@@ -83,9 +95,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <div className="w-6 h-6 bg-terminal-accent rounded flex items-center justify-center text-black font-bold text-xs">T</div>
             <span className="font-bold tracking-wider font-mono text-terminal-text">TITAN</span>
           </div>
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-terminal-text" aria-label="Toggle mobile menu">
-            <Menu size={24} />
-          </button>
+          <div className="flex items-center gap-3">
+             <span className="text-xs font-mono text-terminal-muted hidden sm:block">{user?.displayName}</span>
+             <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-terminal-text" aria-label="Toggle mobile menu">
+               <Menu size={24} />
+             </button>
+          </div>
         </header>
 
         {/* Mobile Menu Overlay */}

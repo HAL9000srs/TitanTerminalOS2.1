@@ -267,6 +267,7 @@ const App: React.FC = () => {
         activeTab={activeTab} 
         onTabChange={setActiveTab}
         onLogout={handleLogout}
+        user={user}
       >
         {renderContent()}
       </Layout>

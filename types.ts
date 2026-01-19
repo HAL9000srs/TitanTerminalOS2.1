@@ -122,6 +122,7 @@ export interface UserProfile {
   createdAt: string;
   role: 'OPERATOR' | 'ADMIN';
   lastLogin: string;
+  displayName: string;
 }
 
 export interface AuthResponse {
