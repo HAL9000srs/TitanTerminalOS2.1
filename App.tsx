@@ -51,7 +51,7 @@ const App: React.FC = () => {
   // Check for existing session on mount
   useEffect(() => {
     const initData = async () => {
-      const session = userService.getSession();
+      const session = await userService.getSession();
       if (session) {
         setUser(session);
       }
