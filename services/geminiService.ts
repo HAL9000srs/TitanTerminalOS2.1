@@ -1,7 +1,7 @@
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { Asset } from '../types';
 
-const API_KEY = process.env.API_KEY || '';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
 let ai: GoogleGenAI | null = null;
 if (API_KEY) {
