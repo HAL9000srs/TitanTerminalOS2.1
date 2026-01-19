@@ -2,7 +2,7 @@ import React from 'react';
 import { Asset, PortfolioSummary, CurrencyCode } from '../types';
 import { convertValue, formatValue, SUPPORTED_CURRENCIES } from '../services/currencyService';
 import { ResponsiveContainer, Tooltip as RechartsTooltip, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, Activity, Globe, ChevronDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Activity, Globe, ChevronDown, AlertCircle } from 'lucide-react';
 
 interface DashboardProps {
   summary: PortfolioSummary;
@@ -22,14 +22,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary, assets, currency,
 
   const convertedStats = getConvertedSummary();
 
-  // Mock historical data for the chart, converted dynamically
-  const mockHistoryData = [
+  // Calculate dynamic Top Performer
+  const topPerformer = assets.length > 0 
+    ? assets.reduce((prev, current) => (prev.change24h > current.change24h) ? prev : current, assets[0])
+    : null;
+
+  // Mock historical data (only show flat line if no assets)
+  const mockHistoryData = assets.length > 0 ? [
     { name: 'Jan', value: convertValue(summary.totalValue * 0.85, currency) },
     { name: 'Feb', value: convertValue(summary.totalValue * 0.88, currency) },
     { name: 'Mar', value: convertValue(summary.totalValue * 0.86, currency) },
     { name: 'Apr', value: convertValue(summary.totalValue * 0.92, currency) },
     { name: 'May', value: convertValue(summary.totalValue * 0.95, currency) },
     { name: 'Jun', value: convertValue(summary.totalValue, currency) },
+  ] : [
+    { name: 'Jan', value: 0 }, { name: 'Feb', value: 0 }, { name: 'Mar', value: 0 },
+    { name: 'Apr', value: 0 }, { name: 'May', value: 0 }, { name: 'Jun', value: 0 },
   ];
 
   return (
@@ -74,7 +82,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary, assets, currency,
             {formatValue(convertedStats.totalValue, currency)}
           </div>
           <div className="mt-2 text-xs text-terminal-muted flex items-center gap-1">
-            <span className="text-emerald-500 font-mono">+2.4%</span>
+            <span className="text-emerald-500 font-mono">
+              {assets.length > 0 ? '+2.4%' : '0.00%'}
+            </span>
             <span>vs last month</span>
           </div>
         </div>
@@ -96,29 +106,45 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary, assets, currency,
           </div>
         </div>
 
-        {/* Top Performer */}
+        {/* Top Performer - BLANK IF NO ASSETS */}
         <div className="bg-terminal-panel border border-terminal-border p-5 rounded-lg relative overflow-hidden group hover:border-terminal-accent/50 transition-colors">
            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <Globe size={48} />
           </div>
           <p className="text-terminal-muted text-xs font-mono uppercase tracking-widest mb-1">Top Performer</p>
-          <div className="text-2xl md:text-3xl font-mono font-medium text-white">NVDA</div>
+          <div className="text-2xl md:text-3xl font-mono font-medium text-white">
+            {topPerformer ? topPerformer.symbol : '—'}
+          </div>
           <div className="mt-2 text-xs text-terminal-muted flex items-center gap-1">
-            <span className="text-emerald-500 font-mono">+12.4%</span>
-            <span>24h change</span>
+            {topPerformer ? (
+              <>
+                <span className="text-emerald-500 font-mono">+{topPerformer.change24h.toFixed(1)}%</span>
+                <span>24h change</span>
+              </>
+            ) : (
+               <span className="text-terminal-muted">No assets active</span>
+            )}
           </div>
         </div>
 
-        {/* Risk Score */}
+        {/* Risk Score - BLANK IF NO ASSETS */}
         <div className="bg-terminal-panel border border-terminal-border p-5 rounded-lg relative overflow-hidden group hover:border-terminal-accent/50 transition-colors">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <TrendingUp size={48} />
           </div>
           <p className="text-terminal-muted text-xs font-mono uppercase tracking-widest mb-1">Risk Score</p>
-          <div className="text-2xl md:text-3xl font-mono font-medium text-amber-400">42/100</div>
+          <div className="text-2xl md:text-3xl font-mono font-medium text-amber-400">
+             {assets.length > 0 ? '42/100' : '—'}
+          </div>
           <div className="mt-2 text-xs text-terminal-muted flex items-center gap-1">
-            <span className="text-terminal-text">Moderate</span>
-            <span>- AI Assessment</span>
+             {assets.length > 0 ? (
+               <>
+                 <span className="text-terminal-text">Moderate</span>
+                 <span>- AI Assessment</span>
+               </>
+             ) : (
+                <span className="text-terminal-muted">Awaiting data</span>
+             )}
           </div>
         </div>
       </div>
@@ -130,35 +156,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary, assets, currency,
               <Activity size={18} className="text-terminal-accent" />
               Portfolio Growth
             </h3>
-            <div className="flex gap-2">
-              {['1D', '1W', '1M', '1Y', 'ALL'].map(t => (
-                <button key={t} className={`px-3 py-1 text-xs rounded border transition-colors ${t === '1M' ? 'bg-terminal-accent text-black border-terminal-accent' : 'bg-transparent text-terminal-muted border-terminal-border hover:border-terminal-muted'}`}>
-                  {t}
-                </button>
-              ))}
-            </div>
           </div>
           <div style={{ width: '100%', height: 300, position: 'relative' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockHistoryData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="name" stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} />
-                <YAxis stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} tickFormatter={(val) => `${SUPPORTED_CURRENCIES[currency].symbol}${val < 1000 ? val : (val/1000).toFixed(0) + 'k'}`} />
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#fff' }}
-                  itemStyle={{ color: '#00dc82' }}
-                  formatter={(value: number) => formatValue(value, currency)}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#00dc82" 
-                  strokeWidth={2} 
-                  dot={{ fill: '#121214', stroke: '#00dc82', strokeWidth: 2, r: 4 }} 
-                  activeDot={{ r: 6, fill: '#00dc82' }} 
-                />
-              </LineChart>
-            </ResponsiveContainer>
+             {assets.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={mockHistoryData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                    <XAxis dataKey="name" stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} tickFormatter={(val) => `${SUPPORTED_CURRENCIES[currency].symbol}${val < 1000 ? val : (val/1000).toFixed(0) + 'k'}`} />
+                    <RechartsTooltip 
+                      contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#fff' }}
+                      itemStyle={{ color: '#00dc82' }}
+                      formatter={(value: number) => formatValue(value, currency)}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#00dc82" 
+                      strokeWidth={2} 
+                      dot={{ fill: '#121214', stroke: '#00dc82', strokeWidth: 2, r: 4 }} 
+                      activeDot={{ r: 6, fill: '#00dc82' }} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+             ) : (
+                <div className="flex flex-col items-center justify-center h-full text-terminal-muted/50 gap-4">
+                   <AlertCircle size={48} />
+                   <p className="font-mono text-sm">INITIALIZE ASSETS TO GENERATE CHART DATA</p>
+                </div>
+             )}
           </div>
         </div>
     </div>

@@ -13,6 +13,12 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange, onLogout, user }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
+  // LOGIC FIX: If the DB returns the default 'OPERATOR' or if it's missing, use your name.
+  // This ensures your name appears immediately.
+  const displayTitle = (user?.displayName && user.displayName !== 'OPERATOR') 
+    ? user.displayName 
+    : 'Malcolm S. Turnquest';
+
   const NavItem = ({ id, icon: Icon, label }: { id: string; icon: any; label: string }) => (
     <button
       onClick={() => {
@@ -48,8 +54,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
                 <User size={14} />
              </div>
              <div className="overflow-hidden">
-                <p className="text-xs text-white font-mono truncate">{user?.displayName || 'OPERATOR'}</p>
-                <p className="text-[10px] text-terminal-muted font-mono truncate">{user?.role} ACCESS</p>
+                {/* NAME DISPLAY FIX */}
+                <p className="text-xs text-white font-mono truncate">{displayTitle}</p>
+                <p className="text-[10px] text-terminal-muted font-mono truncate">OPERATOR ACCESS</p>
              </div>
           </div>
         </div>
@@ -96,7 +103,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <span className="font-bold tracking-wider font-mono text-terminal-text">TITAN</span>
           </div>
           <div className="flex items-center gap-3">
-             <span className="text-xs font-mono text-terminal-muted hidden sm:block">{user?.displayName}</span>
+             <span className="text-xs font-mono text-terminal-muted hidden sm:block">{displayTitle}</span>
              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-terminal-text" aria-label="Toggle mobile menu">
                <Menu size={24} />
              </button>

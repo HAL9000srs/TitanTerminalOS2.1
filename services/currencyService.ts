@@ -17,7 +17,7 @@ export const formatValue = (amount: number, currency: CurrencyCode): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 2, // Changed from 0 to 2 to force decimals
     maximumFractionDigits: 2,
   }).format(amount);
 };
