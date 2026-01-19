@@ -1,11 +1,17 @@
 import { userService as mockService } from './mockUserService';
-import { firebaseUserService as realService } from './firebaseUserService';
+import { firebaseUserService } from './firebaseUserService'; // Keep for safety/fallback
+import { supabaseUserService } from './supabaseUserService';
 
-// Logic: Use Mock if the Env Variable says so, OR if no API key is found
-const useMock = import.meta.env.VITE_USE_MOCK === 'true' || !import.meta.env.VITE_FIREBASE_API_KEY;
+// Logic: Use Mock if explicitly requested, otherwise check for Supabase, then Firebase
+const useMock = import.meta.env.VITE_USE_MOCK === 'true';
+const useSupabase = !!import.meta.env.VITE_SUPABASE_URL;
 
 // Export the chosen service
-export const userService = useMock ? mockService : realService;
+export const userService = useMock 
+  ? mockService 
+  : (useSupabase ? supabaseUserService : firebaseUserService);
 
 // Log active mode for debugging
-console.log(`[SYSTEM] Auth Provider Initialized: ${useMock ? 'MOCK (Local)' : 'FIREBASE (Cloud)'}`);
+console.log(`[SYSTEM] Auth Provider Initialized: ${
+  useMock ? 'MOCK (Local)' : (useSupabase ? 'SUPABASE (Postgres)' : 'FIREBASE (NoSQL)')
+}`);
