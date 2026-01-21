@@ -38,20 +38,11 @@ const App: React.FC = () => {
   // Ticker State
   const [tickerData, setTickerData] = useState(INITIAL_TICKER_DATA);
 
-  // Live Indices State
-  const [indices, setIndices] = useState<MarketIndex[]>([
-    { name: 'S&P 500', symbol: 'S&P 500', value: 5088.80, change: 1.03, changeVal: 52.10 },
-    { name: 'Dow Jones', symbol: 'Dow Jones', value: 39131.53, change: 0.16, changeVal: 62.42 },
-    { name: 'NASDAQ', symbol: 'NASDAQ', value: 16041.62, change: -0.28, changeVal: -44.80 },
-    { name: 'FTSE 100', symbol: 'FTSE 100', value: 7706.28, change: 0.28, changeVal: 21.98 },
-    { name: 'Nikkei 225', symbol: 'Nikkei 225', value: 39098.68, change: 2.19, changeVal: 836.52 },
-    { name: 'DAX', symbol: 'DAX', value: 17419.33, change: 0.14, changeVal: 24.89 },
-  ]);
-
   // Check for existing session on mount
   useEffect(() => {
     const initData = async () => {
-      // ⬇️ ADDED 'await' HERE ⬇️
+      // Verify existing session
+      // and restore user state
       const session = await userService.getSession();
       
       if (session) {
@@ -70,6 +61,18 @@ const App: React.FC = () => {
 
     initData();
   }, []);
+
+  // Live Indices State
+  const [indices, setIndices] = useState<MarketIndex[]>([
+    { name: 'S&P 500', symbol: 'S&P 500', value: 5088.80, change: 1.03, changeVal: 52.10 },
+    { name: 'Dow Jones', symbol: 'Dow Jones', value: 39131.53, change: 0.16, changeVal: 62.42 },
+    { name: 'NASDAQ', symbol: 'NASDAQ', value: 16041.62, change: -0.28, changeVal: -44.80 },
+    { name: 'FTSE 100', symbol: 'FTSE 100', value: 7706.28, change: 0.28, changeVal: 21.98 },
+    { name: 'Nikkei 225', symbol: 'Nikkei 225', value: 39098.68, change: 2.19, changeVal: 836.52 },
+    { name: 'DAX', symbol: 'DAX', value: 17419.33, change: 0.14, changeVal: 24.89 },
+  ]);
+
+
 
   // Initialize WebSocket connection
   useEffect(() => {
