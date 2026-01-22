@@ -118,7 +118,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ summary, assets, currency,
           <div className="mt-2 text-xs text-terminal-muted flex items-center gap-1">
             {topPerformer ? (
               <>
-                <span className="text-emerald-500 font-mono">+{topPerformer.change24h.toFixed(1)}%</span>
+                <span className="text-emerald-500 font-mono">+{topPerformer.change24h.toFixed(2)}%</span>
                 <span>24h change</span>
               </>
             ) : (

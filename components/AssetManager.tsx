@@ -285,7 +285,7 @@ export const AssetManager: React.FC<AssetManagerProps> = ({ assets, onAddAsset, 
                           {formatValue(convertValue(asset.currentPrice, currency), currency)}
                         </span>
                         <span className={`text-[10px] ${asset.change24h >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {asset.change24h > 0 ? '+' : ''}{asset.change24h}%
+                          {asset.change24h > 0 ? '+' : ''}{asset.change24h.toFixed(2)}%
                         </span>
                       </div>
                     </td>
@@ -360,7 +360,7 @@ export const AssetManager: React.FC<AssetManagerProps> = ({ assets, onAddAsset, 
                       </div>
                       <div className={`text-xs mt-1 ${selectedAsset.change24h >= 0 ? 'text-emerald-500' : 'text-rose-500'} flex items-center gap-1`}>
                          {selectedAsset.change24h >= 0 ? <TrendingUp size={12}/> : <TrendingDown size={12}/>}
-                         {selectedAsset.change24h}% (24h)
+                         {selectedAsset.change24h.toFixed(2)}% (24h)
                       </div>
                    </div>
                    <div className="bg-terminal-bg border border-terminal-border rounded p-4">
