@@ -172,6 +172,19 @@ const App: React.FC = () => {
     );
   }
 
+  const handleUserUpdate = async (name: string): Promise<boolean> => {
+    if (!user) return false;
+    const success = await userService.updateDisplayName(user.id, name);
+    if (success) {
+      setUser(prev => prev ? ({ ...prev, displayName: name }) : null);
+    }
+    return success;
+  };
+
+  const handleUserProvision = async (email: string, pass: string, name: string) => {
+    return await userService.provisionUser(email, pass, name);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -183,7 +196,14 @@ const App: React.FC = () => {
       case 'news':
         return <NewsFeed />;
       case 'config':
-        return <TerminalConfig currency={currency} onCurrencyChange={setCurrency} onReset={handleFactoryReset} />;
+        return <TerminalConfig 
+          currency={currency} 
+          onCurrencyChange={setCurrency} 
+          onReset={handleFactoryReset} 
+          user={user} 
+          onUserUpdate={handleUserUpdate}
+          onUserProvision={handleUserProvision}
+        />;
       case 'markets':
         return (
           <div className="space-y-6">

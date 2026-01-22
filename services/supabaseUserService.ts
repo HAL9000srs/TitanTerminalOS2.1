@@ -85,5 +85,36 @@ export const supabaseUserService = {
       lastLogin: session.user.last_sign_in_at || new Date().toISOString(),
       displayName: profile?.display_name || 'OPERATOR'
     };
+  },
+
+  updateDisplayName: async (userId: string, displayName: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ display_name: displayName })
+        .eq('id', userId);
+
+      if (error) throw error;
+      return true;
+    } catch (e) {
+      console.error('Error updating display name:', e);
+      return false;
+    }
+  },
+
+  provisionUser: async (email: string, pass: string, displayName: string): Promise<AuthResponse> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: { email, password: pass, displayName }
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      return { success: true, message: 'OPERATOR PROVISIONED SUCESSFULLY' };
+    } catch (e: any) {
+      console.error('Provisioning Error:', e);
+      return { success: false, message: e.message || 'PROVISIONING FAILED' };
+    }
   }
 };
